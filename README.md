@@ -85,7 +85,8 @@ pyp install pystray
 
 ##### Circuit diagram
 
-![[Mixuino Diegram.pdf]]
+![alt text](https://github.com/thepangel/Mixuino/blob/Development/Mixuino-Diagram.pdf)
+
 
 ---
 
