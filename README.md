@@ -104,8 +104,7 @@ The program automatically detects in what port the Arduino in connected and star
 
 
 - [ ] Slider 3D Models for 3D printing!
-- [ ] Select processes for sliders 2-4 in the systray
-	- [ ] GUI? 
+- [ ] GUI to select which slides control which process
 
 ---
 ## Contributing?

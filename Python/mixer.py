@@ -1,5 +1,4 @@
 # Import of all required dependencies
-
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume, ISimpleAudioVolume
 from ctypes import cast, POINTER
@@ -82,11 +81,7 @@ def stop():
 # Initiates systray menu with option "Exit" which calls the stop func
 menu1 = (item("Exit", stop),)
 
-
-
 # File for the icon image (image or .ico)
-
-
 file = "logo.png"
 
 # Creates the systray icon object
@@ -111,92 +106,95 @@ try:
         # Removes the prefixes and suffixes from the data and removes unwanted spaces
         serialData = serialData.replace("b'", "").replace("\\n'", "").rstrip()
         
-        # If the value is not empy and starts with the indicator a, change master volume
-        if serialData != "" and serialData[0] == "a":
-            
-            # Removes slider indicator so we are left with the numerical value
-            serialData = serialData.replace("a", "")
-            
-            # Assigns the data in float format into a variable
-            masterVolume = float(serialData)
-            
-            # Changes the master volume to the desired volume (Since it's scalar the volume is from 0.0 to 1.0)
-            volume.SetMasterVolumeLevelScalar(masterVolume, None)   
+        # Checks if the serial data is not empty
+        if serialData != "":
         
-        # If the value is not empy and starts with the indicator b, change the volume of any process you would like 
-        if serialData != "" and serialData[0] == "b":
+            # If the value starts with the indicator a, change master volume
+            if serialData.startswith("a"):
+                
+                # Removes slider indicator so we are left with the numerical value
+                serialData = serialData.replace("a", "")
+                
+                # Assigns the data in float format into a variable
+                masterVolume = float(serialData)
+                
+                # Changes the master volume to the desired volume (Since it's scalar the volume is from 0.0 to 1.0)
+                volume.SetMasterVolumeLevelScalar(masterVolume, None)   
             
-            # Loops through all the sessions currently running
-            for session in sessions:
+            # If the value starts with the indicator b, change the volume of any process you would like 
+            if serialData.startswith("b"):
                 
-                # Initiates volume manipulation for processes
-                volume1 = session._ctl.QueryInterface(ISimpleAudioVolume)
-                
-                # Checks if process is the one you want
-                if session.Process and session.Process.name() == "processA.exe":
-                
-                    # Removes slider indicator so we are left with the numerical value
-                    serialData = serialData.replace("b", "")
+                # Loops through all the sessions currently running
+                for session in sessions:
                     
-                    # Assigns the data in float format into a variable
-                    masterVolume = float(serialData)   
+                    # Initiates volume manipulation for processes
+                    volume1 = session._ctl.QueryInterface(ISimpleAudioVolume)
                     
-                    # Changes the sessin volume to the desired volume (From 0.0 to 1.0)
-                    volume1.SetMasterVolume(masterVolume, None)
-        
-        
-        # If the value is not empy and starts with the indicator c, change the volume of any process you would like 
-        if serialData != "" and serialData[0] == "c":
-            
-            # Loops through all the sessions currently running
-            for session in sessions:
-                
-                # Initiates volume manipulation for processes  
-                volume2 = session._ctl.QueryInterface(ISimpleAudioVolume)
-                
-                # Checks if process is the one you want
-                if session.Process and session.Process.name() == "prcessB.exe":
+                    # Checks if process is the one you want
+                    if session.Process and session.Process.name() == "brave.exe":
+                    
+                        # Removes slider indicator so we are left with the numerical value
+                        serialData = serialData.replace("b", "")
                         
-                    # Removes slider indicatr so we are left with the numerical value
-                    serialData = serialData.replace("c", "")
-                    
-                    # Assigns the data in float format into a variable
-                    masterVolume1 = float(serialData)
-                    
-                    # Changes the sessin volume to the desired volume (From 0.0 to 1.0)
-                    volume2.SetMasterVolume(masterVolume1, None)
-        
-        
-        # If the value is not empy and starts with the indicator d, change the volume of any process you would like 
-        if serialData != "" and serialData[0] == "d":
-            
-            # Loops through all the sessions currently running
-            for session in sessions:
-                
-                # Initiates volume manipulation for processes  
-                volume3 = session._ctl.QueryInterface(ISimpleAudioVolume)
-                
-                # Checks if process is the one you want
-                if session.Process and session.Process.name() == "processC.exe":
+                        # Assigns the data in float format into a variable
+                        masterVolume = float(serialData)   
                         
-                    # Removes slider indicatr so we are left with the numerical value
-                    serialData = serialData.replace("d", "")
+                        # Changes the sessin volume to the desired volume (From 0.0 to 1.0)
+                        volume1.SetMasterVolume(masterVolume, None)
+            
+            
+            # If the value starts with the indicator c, change the volume of any process you would like 
+            if serialData.startswith("c"):
+                
+                # Loops through all the sessions currently running
+                for session in sessions:
                     
-                    # Assigns the data in float format into a variable
-                    masterVolume = float(serialData)
+                    # Initiates volume manipulation for processes  
+                    volume2 = session._ctl.QueryInterface(ISimpleAudioVolume)
                     
-                    # Changes the sessin volume to the desired volume (From 0.0 to 1.0)
-                    volume3.SetMasterVolume(masterVolume, None)
+                    # Checks if process is the one you want
+                    if session.Process and session.Process.name() == "prcessB.exe":
+                            
+                        # Removes slider indicatr so we are left with the numerical value
+                        serialData = serialData.replace("c", "")
+                        
+                        # Assigns the data in float format into a variable
+                        masterVolume1 = float(serialData)
+                        
+                        # Changes the sessin volume to the desired volume (From 0.0 to 1.0)
+                        volume2.SetMasterVolume(masterVolume1, None)
             
-        
-        # If the value is not empy and starts with the indicator c, mute the speakers 
-        if serialData != "" and serialData[0] == "e":
             
-            # Removes slider indicatr so we are left with the numerical value
-            serialData = serialData.replace("e", "")
+            # If the value starts with the indicator d, change the volume of any process you would like 
+            if serialData.startswith("d"):
+                
+                # Loops through all the sessions currently running
+                for session in sessions:
+                    
+                    # Initiates volume manipulation for processes  
+                    volume3 = session._ctl.QueryInterface(ISimpleAudioVolume)
+                    
+                    # Checks if process is the one you want
+                    if session.Process and session.Process.name() == "processC.exe":
+                            
+                        # Removes slider indicatr so we are left with the numerical value
+                        serialData = serialData.replace("d", "")
+                        
+                        # Assigns the data in float format into a variable
+                        masterVolume = float(serialData)
+                        
+                        # Changes the sessin volume to the desired volume (From 0.0 to 1.0)
+                        volume3.SetMasterVolume(masterVolume, None)
+                
             
-            # Mutes the speakers (1 muted, 0 un-muted)
-            volume.SetMute(int(serialData), None)
+            # If the value starts with the indicator c, mute the speakers 
+            if serialData.startswith("e"):
+                
+                # Removes slider indicatr so we are left with the numerical value
+                serialData = serialData.replace("e", "")
+                
+                # Mutes the speakers (1 muted, 0 un-muted)
+                volume.SetMute(int(serialData), None)
 
 
 # Prints exception error      
