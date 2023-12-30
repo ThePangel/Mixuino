@@ -14,6 +14,8 @@
 - Table of contents
 	- Description
 	- Built with
+	- Usage
+		- UI
 	- Getting started
 		- Software
 			- Required libraries
@@ -43,6 +45,21 @@ This is my first Arduino projects and first *"big"* program so please bear with 
 - ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
 
 ---
+## Usage 
+
+### UI
+
+![UI](UI.png)
+
+Each option menu changes the process which each slider controls the volume of (1<sup>st</sup> slider is for master volume)
+
+Hide to systray hides the window, the window can be revealed again from the systray icon option  ``Show`` 
+
+The options available refreshes and changes (if new programs are opened or others closed) when the mouse hovers any of the option menus
+
+To close the application you can just close this window or close it with the ``Exit`` option in the systray icon
+
+---
 ## Getting started
 
 ### Software
@@ -62,6 +79,10 @@ pycaw==20230407 # For audio handling
 pyserial==3.5 # To read the serial data sent from the arduino
 
 pystray==0.19.5 # To create and manage the systray icon
+
+PyYAML==6.0.1 # To edit the Yaml config file
+
+customtkinter==5.2.1 # To build the UI
 ```
 
 ```console
@@ -73,7 +94,11 @@ pip install pycaw
 
 pip install pyserial
 
-pyp install pystray
+pip install pystray
+
+pip install customtkinter
+
+pip install PyYAML
 ```
 ##### Nothing needed for the Arduino
 
@@ -104,7 +129,7 @@ The program automatically detects in what port the Arduino in connected and star
 
 
 - [ ] Slider 3D Models for 3D printing!
-- [ ] GUI to select which slides control which process
+- [x] GUI to select which slides control which process (30/12/2023)
 
 ---
 ## Contributing?
