@@ -16,6 +16,7 @@
 	- Built with
 	- Usage
 		- UI
+		- Config file
 	- Getting started
 		- Software
 			- Required libraries
