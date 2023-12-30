@@ -23,7 +23,6 @@
 		- Hardware
 			- Required hardware
 			- Circuit diagram
-	- Usage
 	- Roadmap!
 	- Contributing?
 	- Contact
@@ -126,14 +125,6 @@ pip install PyYAML
 
 ---
 
-## Usage
-
-You can build the script into an exe or just run the python file.
-To change the processes that slider 2-4 control you can edit the if statements in the code. I am currently working on a way to do this directly in the program dynamically without hard coding it.
-
-The program automatically detects in what port the Arduino in connected and starts a serial connection. Thats it, if you have the circuit well built just move the sliders and the volume will begin to change :)
-
----
 ## Roadmap!
 
 
