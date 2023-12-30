@@ -2,4 +2,4 @@
 dist/
 build/
 test.py
-Python\processes.yaml
+Python/processes.yaml
