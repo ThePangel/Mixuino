@@ -16,6 +16,7 @@
 	- Built with
 	- Usage
 		- UI
+		- Config file
 	- Getting started
 		- Software
 			- Required libraries
@@ -23,7 +24,6 @@
 		- Hardware
 			- Required hardware
 			- Circuit diagram
-	- Usage
 	- Roadmap!
 	- Contributing?
 	- Contact
@@ -31,7 +31,6 @@
 
 
 ---------
-#### WARNING  ⚠️: VERY W.I.P!!
 
 Mixuino is a windows audio mixer build with on a Arduino nano and controlled by a python program. It uses 4 slide potentiometers feeding analog input into an Arduino nano that sends the values through serial to a python scripts that handles volume management in the windows machine. You can also add an optional push button to mute/un-mute the speakers. 
 
@@ -58,6 +57,16 @@ Hide to systray hides the window, the window can be revealed again from the syst
 The options available refreshes and changes (if new programs are opened or others closed) when the mouse hovers any of the option menus
 
 To close the application you can just close this window or close it with the ``Exit`` option in the systray icon
+
+### Config file
+
+To run the program you require [processes.yaml](processes.yaml) file with the structure : 
+```yaml
+slider1: ''
+slider2: ''
+slider3: ''
+```
+The values are the processes each slide changes and can be changed manually or through the UI
 
 ---
 ## Getting started
@@ -117,14 +126,6 @@ pip install PyYAML
 
 ---
 
-## Usage
-
-You can build the script into an exe or just run the python file.
-To change the processes that slider 2-4 control you can edit the if statements in the code. I am currently working on a way to do this directly in the program dynamically without hard coding it.
-
-The program automatically detects in what port the Arduino in connected and starts a serial connection. Thats it, if you have the circuit well built just move the sliders and the volume will begin to change :)
-
----
 ## Roadmap!
 
 
