@@ -204,206 +204,217 @@ def guiManipulator():
 
 # Audio manipulator thread
 def audioManipulator():
-
-    # Initiates com library in current thread 
-    comtypes.CoInitialize()
-     
-    # Sets up global UI variable root to be able to close the window 
-    global root
-
-    # Initiates Variable used to check if the port is already assigned
-    isAssigned = False
-
-    # Initiates variable containing the COM port number
-    portNum = 0
-
-    # Function that assigns the COM port number where the Arduino Nano is connected
-    def portAssign():
         
-        # Makes the isAssigned variable globally accessible
-        nonlocal isAssigned
+        # Initializes de runOnce variable, used so even if the board disconnects, you dont create another systray icon
+        runOnce = False
         
-        # Checks if the port is assigned
-        while not isAssigned:
-            
-            # Makes the variable containing the COM port number globally accessible
-            nonlocal portNum
-            
-            # Makes a list of all COM ports and what's connected to them
-            ports = list(serial.tools.list_ports.comports())
-            
-            # Loops through all the ports
-            for p in ports:
-                
-                # Loops through all the possible COM ports that the Arduino Nano could be connected to
-                for portNum in range(0, 9):
-                   
-                    # Check if the device connected is the Arduino Nano
-                    if "CH340" in p[1] and f"COM{portNum}" in p[1]:
-                        
-                        # Makes isAssigned true 
-                        isAssigned = True
-                        
-                        # Returns the Function
-                        return 
-            
-            # Delay for letting the function read the ports and not have them still open
-            time.sleep(5)
-
-    # Calls the portAssign function
-    portAssign()
-
-    # Makes a variable containing the connection to the Arduino Nano
-    arduino = serial.Serial(port=f'COM{portNum}', baudrate=57600, timeout=.1) 
-
-    # Gets speaker for audio manipulation
-    devices = AudioUtilities.GetSpeakers()
-
-    # Initiates audio interface
-    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-
-    # Initiates volume manipulation
-    volume = cast(interface, POINTER(IAudioEndpointVolume))
-
-    # Gets running Sessions
-    sessions = AudioUtilities.GetAllSessions()
-    
-    # Functions that stop the systray icon and set stopb to true so the loop exits the program 
-    def stop():
-        global stopb
-        stopb = True
-        
-        icon.stop()
-
-    def show():
-        root.after(0, root.deiconify())
-
-
-    # Initiates systray menu with option "Exit" which calls the stop func
-    menu1 = (item("Show", show), item("Exit", stop),)
-
-    # File for the icon image (image or .ico)
-    file = resource_path("logo.png")
-
-    # Creates the systray icon object
-    icon = pystray.Icon(name="name", icon=Image.open(file), title="Mixer", menu=menu1)
-
-    # Initializes the systray icon in parallel so the script keeps running
-    icon.run_detached()
-
-    # Tries to execute the main script if else it exits with the error
-    try:
-        
-        # Infinite loop to constantly monitor and change the audio volume
         while True:
             
-            # Checks if it has to stop the program
-            if stopb:
-                root.after(50, root.destroy)
-                icon.stop()
-                sys.exit()
             
+            # Initiates com library in current thread 
+            comtypes.CoInitialize()
             
-            # Stores the received data of the Arduino into the variable
-            serialData = str(arduino.readline())
-            
-            # Removes the prefixes and suffixes from the data and removes unwanted spaces
-            serialData = serialData.replace("b'", "").replace("\\n'", "").rstrip()
-            
-            # Checks if the serial data is not empty
-            if serialData:
+            # Sets up global UI variable root to be able to close the window 
+            global root
+
+            # Initiates Variable used to check if the port is already assigned
+            isAssigned = False
+
+            # Initiates variable containing the COM port number
+            portNum = 0
+
+            # Function that assigns the COM port number where the Arduino Nano is connected
+            def portAssign():
                 
-                # If the value starts with the indicator a, change master volume
-                if serialData.startswith("a"):
+                # Makes the isAssigned variable globally accessible
+                nonlocal isAssigned
+                
+                # Checks if the port is assigned
+                while not isAssigned:
                     
-                    # Removes slider indicator so we are left with the numerical value
-                    serialData = serialData.replace("a", "")
+                    # Makes the variable containing the COM port number globally accessible
+                    nonlocal portNum
                     
-                    # Assigns the data in float format into a variable
-                    masterVolume = float(serialData)
-                   
-                    # Changes the master volume to the desired volume (Since it's scalar the volume is from 0.0 to 1.0)
-                    volume.SetMasterVolumeLevelScalar(masterVolume, None)   
-               
-                # If the value starts with the indicator b, change the volume of any process you would like 
-                if serialData.startswith("b"):
-                   
-                    # Loops through all the sessions currently running
-                    for session in sessions:
+                    # Makes a list of all COM ports and what's connected to them
+                    ports = list(serial.tools.list_ports.comports())
+                    
+                    # Loops through all the ports
+                    for p in ports:
                         
-                        # Initiates volume manipulation for processes
-                        volume1 = session._ctl.QueryInterface(ISimpleAudioVolume)
+                        # Loops through all the possible COM ports that the Arduino Nano could be connected to
+                        for portNum in range(0, 9):
                         
-                        # Checks if the process is the one you want
-                        if session.Process and session.Process.name() == configfile['slider1']:
+                            # Check if the device connected is the Arduino Nano
+                            if "CH340" in p[1] and f"COM{portNum}" in p[1]:
+                                
+                                # Makes isAssigned true 
+                                isAssigned = True
+                                
+                                # Returns the Function
+                                return 
+                    
+                    # Delay for letting the function read the ports and not have them still open
+                    time.sleep(5)
+
+            # Calls the portAssign function
+            portAssign()
+
+            # Makes a variable containing the connection to the Arduino Nano
+            arduino = serial.Serial(port=f'COM{portNum}', baudrate=57600, timeout=.1) 
+
+            # Gets speaker for audio manipulation
+            devices = AudioUtilities.GetSpeakers()
+
+            # Initiates audio interface
+            interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+
+            # Initiates volume manipulation
+            volume = cast(interface, POINTER(IAudioEndpointVolume))
+
+            # Gets running Sessions
+            sessions = AudioUtilities.GetAllSessions()
+            
+            # Functions that stop the systray icon and set stopb to true so the loop exits the program 
+            def stop():
+                global stopb
+                stopb = True
+                
+                icon.stop()
+
+            def show():
+                root.after(0, root.deiconify())
+
+            # Checks if loop has been run so it doesn't create a new systray icon
+            if runOnce == False:
+                # Initiates systray menu with option "Exit" which calls the stop func
+                menu1 = (item("Show", show), item("Exit", stop),)
+
+                # File for the icon image (image or .ico)
+                file = resource_path("logo.png")
+
+                # Creates the systray icon object
+                icon = pystray.Icon(name="name", icon=Image.open(file), title="Mixer", menu=menu1)
+
+                # Initializes the systray icon in parallel so the script keeps running
+                icon.run_detached()
+            
+            # Sets variable to true since the loop has run
+            runOnce = True
+
+            # Tries to execute the main script if else it exits with the error
+            try:
+                
+                # Infinite loop to constantly monitor and change the audio volume
+                while True:
+                    
+                    
+                    
+                    # Checks if it has to stop the program
+                    if stopb:
+                        root.after(50, root.destroy)
+                        icon.stop()
+                        sys.exit()
+                    
+                    
+                    # Stores the received data of the Arduino into the variable
+                    serialData = str(arduino.readline())
+                    
+                    # Removes the prefixes and suffixes from the data and removes unwanted spaces
+                    serialData = serialData.replace("b'", "").replace("\\n'", "").rstrip()
+                    
+                    # Checks if the serial data is not empty
+                    if serialData:
+                        
+                        # If the value starts with the indicator a, change master volume
+                        if serialData.startswith("a"):
                             
-                            session.Process.name()
                             # Removes slider indicator so we are left with the numerical value
-                            serialData = serialData.replace("b", "")
-                            
-                            # Assigns the data in float format into a variable
-                            masterVolume = float(serialData)   
-                            
-                            # Changes the session volume to the desired volume (From 0.0 to 1.0)
-                            volume1.SetMasterVolume(masterVolume, None)
-               
-                # If the value starts with the indicator c, change the volume of any process you would like 
-                if serialData.startswith("c"):
-                   
-                    # Loops through all the sessions currently running
-                    for session in sessions:
-                       
-                        # Initiates volume manipulation for processes  
-                        volume2 = session._ctl.QueryInterface(ISimpleAudioVolume)
-                        
-                        # Checks if the process is the one you want
-                        if session.Process and session.Process.name() == configfile['slider2']:
-                            
-                            # Removes slider indicator so we are left with the numerical value
-                            serialData = serialData.replace("c", "")
-                            
-                            # Assigns the data in float format into a variable
-                            masterVolume1 = float(serialData)
-                           
-                            # Changes the session volume to the desired volume (From 0.0 to 1.0)
-                            volume2.SetMasterVolume(masterVolume1, None)
-               
-                # If the value starts with the indicator d, change the volume of any process you would like 
-                if serialData.startswith("d"):
-                   
-                    # Loops through all the sessions currently running
-                    for session in sessions:
-                        
-                        # Initiates volume manipulation for processes  
-                        volume3 = session._ctl.QueryInterface(ISimpleAudioVolume)
-                        
-                        # Checks if the process is the one you want
-                        if session.Process and session.Process.name() == configfile['slider3']:
-                           
-                            # Removes slider indicator so we are left with the numerical value
-                            serialData = serialData.replace("d", "")
+                            serialData = serialData.replace("a", "")
                             
                             # Assigns the data in float format into a variable
                             masterVolume = float(serialData)
-                           
-                            # Changes the session volume to the desired volume (From 0.0 to 1.0)
-                            volume3.SetMasterVolume(masterVolume, None)
-                
-                # If the value starts with the indicator c, mute the speakers 
-                if serialData.startswith("e"):
-                   
-                    # Removes slider indicator so we are left with the numerical value
-                    serialData = serialData.replace("e", "")
-                   
-                    # Mutes the speakers (1 muted, 0 un-muted)
-                    volume.SetMute(int(serialData), None)
+                        
+                            # Changes the master volume to the desired volume (Since it's scalar the volume is from 0.0 to 1.0)
+                            volume.SetMasterVolumeLevelScalar(masterVolume, None)   
+                    
+                        # If the value starts with the indicator b, change the volume of any process you would like 
+                        if serialData.startswith("b"):
+                        
+                            # Loops through all the sessions currently running
+                            for session in sessions:
+                                
+                                # Initiates volume manipulation for processes
+                                volume1 = session._ctl.QueryInterface(ISimpleAudioVolume)
+                                
+                                # Checks if the process is the one you want
+                                if session.Process and session.Process.name() == configfile['slider1']:
+                                    
+                                    session.Process.name()
+                                    # Removes slider indicator so we are left with the numerical value
+                                    serialData = serialData.replace("b", "")
+                                    
+                                    # Assigns the data in float format into a variable
+                                    masterVolume = float(serialData)   
+                                    
+                                    # Changes the session volume to the desired volume (From 0.0 to 1.0)
+                                    volume1.SetMasterVolume(masterVolume, None)
+                    
+                        # If the value starts with the indicator c, change the volume of any process you would like 
+                        if serialData.startswith("c"):
+                        
+                            # Loops through all the sessions currently running
+                            for session in sessions:
+                            
+                                # Initiates volume manipulation for processes  
+                                volume2 = session._ctl.QueryInterface(ISimpleAudioVolume)
+                                
+                                # Checks if the process is the one you want
+                                if session.Process and session.Process.name() == configfile['slider2']:
+                                    
+                                    # Removes slider indicator so we are left with the numerical value
+                                    serialData = serialData.replace("c", "")
+                                    
+                                    # Assigns the data in float format into a variable
+                                    masterVolume1 = float(serialData)
+                                
+                                    # Changes the session volume to the desired volume (From 0.0 to 1.0)
+                                    volume2.SetMasterVolume(masterVolume1, None)
+                    
+                        # If the value starts with the indicator d, change the volume of any process you would like 
+                        if serialData.startswith("d"):
+                        
+                            # Loops through all the sessions currently running
+                            for session in sessions:
+                                
+                                # Initiates volume manipulation for processes  
+                                volume3 = session._ctl.QueryInterface(ISimpleAudioVolume)
+                                
+                                # Checks if the process is the one you want
+                                if session.Process and session.Process.name() == configfile['slider3']:
+                                
+                                    # Removes slider indicator so we are left with the numerical value
+                                    serialData = serialData.replace("d", "")
+                                    
+                                    # Assigns the data in float format into a variable
+                                    masterVolume = float(serialData)
+                                
+                                    # Changes the session volume to the desired volume (From 0.0 to 1.0)
+                                    volume3.SetMasterVolume(masterVolume, None)
+                        
+                        # If the value starts with the indicator c, mute the speakers 
+                        if serialData.startswith("e"):
+                        
+                            # Removes slider indicator so we are left with the numerical value
+                            serialData = serialData.replace("e", "")
+                        
+                            # Mutes the speakers (1 muted, 0 un-muted)
+                            volume.SetMute(int(serialData), None)
 
-    
-
-    # Prints exception error      
-    except Exception as e: 
-        print(f"Error: {e}")
-        sys.exit()
+            
+            # Prints exception error      
+            except Exception as e: 
+                print(f"Error: {e}")
+                arduino.close()
 
 
 # Creates the GUI thread
@@ -416,7 +427,4 @@ audioThread = threading.Thread(target=audioManipulator)
 audioThread.start()
 guiThread.start()
 
-# Join the threads
-audioThread.join()
-guiThread.join()
 
