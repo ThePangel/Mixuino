@@ -20,6 +20,7 @@ import os
 global root
 global stopb
 stopb = False
+global defHide
 
 # Write to the config file
 def write_yaml(data):
@@ -71,7 +72,7 @@ def guiManipulator():
     # Set global variables
     global slide1
     global root
-
+    
     # Initiates com library in current thread 
     comtypes.CoInitialize()
 
@@ -99,7 +100,16 @@ def guiManipulator():
     # Hides UI window
     def hide():
         root.withdraw()
-    
+
+    # Sets the hideDeefault value
+    def defaultHide():
+        if configfile['hideDefault'] == True:
+            configfile['hideDefault'] = False
+            write_yaml(configfile)
+        else:
+            configfile['hideDefault'] = True
+            write_yaml(configfile)
+            
     # Creates empty sessionList
     sessionList = []
 
@@ -123,7 +133,12 @@ def guiManipulator():
         dropdown_menu1.configure(values=sessionList)
         dropdown_menu2.configure(values=sessionList)
         dropdown_menu3.configure(values=sessionList)
-        
+
+        # Checks if window is hidden by default
+        if configfile['hideDefault'] == True:
+            defHide.set(True)
+        else:
+            defHide.set(False)
     
     # Sets display mode to system setting (dark || light)
     customtkinter.set_appearance_mode("system")
@@ -135,13 +150,16 @@ def guiManipulator():
     root = customtkinter.CTk()
 
     # (Set the windows size to 300x400 (works fine with 1080p))
-    root.geometry("300x400") 
+    root.geometry("300x450") 
 
     # Sets window title
     root.title("Mixuino")
     
-    # Sets windopw icon
+    # Sets window icon
     root.iconbitmap(resource_path("logo.ico"))
+
+    # Creates defHide var to check if checkbox must be checked by default
+    defHide = customtkinter.BooleanVar()    
     
     # Creates frame and sets padding
     frame = customtkinter.CTkFrame(master=root)
@@ -193,6 +211,10 @@ def guiManipulator():
     button = customtkinter.CTkButton(frame, text="Hide to systray", command=hide)
     button.pack(padx=10, pady=10)
     
+    # Creates checkbox that sets if the window should be hidden on startup
+    hideDefault = customtkinter.CTkCheckBox(frame, text="Hide to systray on startup", command=defaultHide, variable=defHide)
+    hideDefault.pack(padx=10, pady=10)
+    
     # When window is close shut the program
     root.protocol("WM_DELETE_WINDOW", close)
 
@@ -207,7 +229,7 @@ def audioManipulator():
         
         # Initializes de runOnce variable, used so even if the board disconnects, you dont create another systray icon
         runOnce = False
-        
+
         while True:
             
             
@@ -283,7 +305,7 @@ def audioManipulator():
 
             def show():
                 root.after(0, root.deiconify())
-
+            
             # Checks if loop has been run so it doesn't create a new systray icon
             if runOnce == False:
                 # Initiates systray menu with option "Exit" which calls the stop func
@@ -297,6 +319,10 @@ def audioManipulator():
 
                 # Initializes the systray icon in parallel so the script keeps running
                 icon.run_detached()
+
+                # Checks if the window must be hidden on startup
+                if configfile['hideDefault'] == True:
+                    root.after(0, root.withdraw())
             
             # Sets variable to true since the loop has run
             runOnce = True
@@ -314,7 +340,6 @@ def audioManipulator():
                         root.after(50, root.destroy)
                         icon.stop()
                         sys.exit()
-                    
                     
                     # Stores the received data of the Arduino into the variable
                     serialData = str(arduino.readline())
@@ -426,5 +451,10 @@ audioThread = threading.Thread(target=audioManipulator)
 # Starts threads
 audioThread.start()
 guiThread.start()
+
+# Joins threads
+audioThread.join()
+guiThread.join()
+
 
 

@@ -54,6 +54,8 @@ Each option menu changes the process which each slider controls the volume of (1
 
 Hide to systray hides the window, the window can be revealed again from the systray icon option  ``Show`` 
 
+There is also a checkbox than when checked changes the ``hideDefault`` value if you want the window to be hidden at startup
+
 The options available refreshes and changes (if new programs are opened or others closed) when the mouse hovers any of the option menus
 
 To close the application you can just close this window or close it with the ``Exit`` option in the systray icon
@@ -62,9 +64,11 @@ To close the application you can just close this window or close it with the ``E
 
 To run the program you require [processes.yaml](processes.yaml) file with the structure : 
 ```yaml
+hideDefault: false
 slider1: ''
 slider2: ''
 slider3: ''
+
 ```
 The values are the processes each slide changes and can be changed manually or through the UI
 
@@ -105,9 +109,9 @@ pip install pyserial
 
 pip install pystray
 
-pip install customtkinter
-
 pip install PyYAML
+
+pip install customtkinter
 ```
 ##### Nothing needed for the Arduino
 
