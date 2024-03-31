@@ -9,7 +9,7 @@ from pystray import Menu, MenuItem as item
 from PIL import Image
 import sys
 import serial.tools.list_ports
-import time
+import time 
 import threading 
 import customtkinter
 import yaml
@@ -330,10 +330,11 @@ def audioManipulator():
             # Tries to execute the main script if else it exits with the error
             try:
                 
+                # Initializes a serialData variable useds to check if values have changed
+                serialData1 = ""
+                
                 # Infinite loop to constantly monitor and change the audio volume
                 while True:
-                    
-                    
                     
                     # Checks if it has to stop the program
                     if stopb:
@@ -342,98 +343,59 @@ def audioManipulator():
                         sys.exit()
                     
                     # Stores the received data of the Arduino into the variable
-                    serialData = str(arduino.readline())
+                    serialData = str(arduino.readline().decode())
                     
                     # Removes the prefixes and suffixes from the data and removes unwanted spaces
                     serialData = serialData.replace("b'", "").replace("\\n'", "").rstrip()
                     
-                    # Checks if the serial data is not empty
-                    if serialData:
-                        
-                        # If the value starts with the indicator a, change master volume
-                        if serialData.startswith("a"):
+                    # Compares if values have changed so there is no need to change every second
+                    if serialData1 != serialData:
+                    
+                        # Equals variables for comparisong in the next loop itiration
+                        serialData1 = serialData
+
+                        # Checks if the serial data is not empty
+                        if serialData:
                             
-                            # Removes slider indicator so we are left with the numerical value
-                            serialData = serialData.replace("a", "")
-                            
+                            # Adds the slider values to the slider list
+                            slider =[]
+                            slider.append(serialData[0:4])   # Slider[0]
+                            slider.append(serialData[4:8])   # Slider[1]
+                            slider.append(serialData[8:12])  # Slider[2]
+                            slider.append(serialData[12:16]) # Slider[3]
+
                             # Assigns the data in float format into a variable
-                            masterVolume = float(serialData)
-                        
+                            masterVolume = float(slider[0])
+
                             # Changes the master volume to the desired volume (Since it's scalar the volume is from 0.0 to 1.0)
-                            volume.SetMasterVolumeLevelScalar(masterVolume, None)   
-                    
-                        # If the value starts with the indicator b, change the volume of any process you would like 
-                        if serialData.startswith("b"):
-                        
-                            # Loops through all the sessions currently running
-                            for session in sessions:
-                                
-                                # Initiates volume manipulation for processes
-                                volume1 = session._ctl.QueryInterface(ISimpleAudioVolume)
+                            volume.SetMasterVolumeLevelScalar(masterVolume, None)
+
+                            # Loops for each slider
+                            for i in range(1,4):
                                 
                                 # Checks if the process is the one you want
-                                if session.Process and session.Process.name() == configfile['slider1']:
-                                    
-                                    session.Process.name()
-                                    # Removes slider indicator so we are left with the numerical value
-                                    serialData = serialData.replace("b", "")
-                                    
-                                    # Assigns the data in float format into a variable
-                                    masterVolume = float(serialData)   
-                                    
-                                    # Changes the session volume to the desired volume (From 0.0 to 1.0)
-                                    volume1.SetMasterVolume(masterVolume, None)
-                    
-                        # If the value starts with the indicator c, change the volume of any process you would like 
-                        if serialData.startswith("c"):
-                        
-                            # Loops through all the sessions currently running
-                            for session in sessions:
+                                for session in sessions:
+                                        
+                                        # Initiates volume manipulation for processes
+                                        processedVolume = session._ctl.QueryInterface(ISimpleAudioVolume)
+                                        
+                                        # Checks if the process is the one you want
+                                        if session.Process and session.Process.name() == configfile[f'slider{i}']:
+                                            
+                                            # Assigns the data in float format into a variable
+                                            masterVolume = float(slider[i])   
+                                            
+                                            # Changes the session volume to the desired volume (From 0.0 to 1.0)
+                                            processedVolume.SetMasterVolume(masterVolume, None)
+
+                            # If the value starts with the indicator e, mute the speakers 
+                            if serialData.startswith("e"):
                             
-                                # Initiates volume manipulation for processes  
-                                volume2 = session._ctl.QueryInterface(ISimpleAudioVolume)
-                                
-                                # Checks if the process is the one you want
-                                if session.Process and session.Process.name() == configfile['slider2']:
-                                    
-                                    # Removes slider indicator so we are left with the numerical value
-                                    serialData = serialData.replace("c", "")
-                                    
-                                    # Assigns the data in float format into a variable
-                                    masterVolume1 = float(serialData)
-                                
-                                    # Changes the session volume to the desired volume (From 0.0 to 1.0)
-                                    volume2.SetMasterVolume(masterVolume1, None)
-                    
-                        # If the value starts with the indicator d, change the volume of any process you would like 
-                        if serialData.startswith("d"):
-                        
-                            # Loops through all the sessions currently running
-                            for session in sessions:
-                                
-                                # Initiates volume manipulation for processes  
-                                volume3 = session._ctl.QueryInterface(ISimpleAudioVolume)
-                                
-                                # Checks if the process is the one you want
-                                if session.Process and session.Process.name() == configfile['slider3']:
-                                
-                                    # Removes slider indicator so we are left with the numerical value
-                                    serialData = serialData.replace("d", "")
-                                    
-                                    # Assigns the data in float format into a variable
-                                    masterVolume = float(serialData)
-                                
-                                    # Changes the session volume to the desired volume (From 0.0 to 1.0)
-                                    volume3.SetMasterVolume(masterVolume, None)
-                        
-                        # If the value starts with the indicator c, mute the speakers 
-                        if serialData.startswith("e"):
-                        
-                            # Removes slider indicator so we are left with the numerical value
-                            serialData = serialData.replace("e", "")
-                        
-                            # Mutes the speakers (1 muted, 0 un-muted)
-                            volume.SetMute(int(serialData), None)
+                                # Removes slider indicator so we are left with the numerical value
+                                serialData = serialData.replace("e", "")
+                            
+                                # Mutes the speakers (1 muted, 0 un-muted)
+                                volume.SetMute(int(serialData), None)
 
             
             # Prints exception error      
