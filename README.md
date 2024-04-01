@@ -50,13 +50,13 @@ This is my first Arduino projects and first *"big"* program so please bear with 
 
 ![UI](UI.png)
 
-Each option menu changes the process which each slider controls the volume of (1<sup>st</sup> slider is for master volume)
+Each checkbox corresponds to a running process and/or a process stored in the config file, ones stored (therefore selected) are checked, moving that slider will change the volume of selected processes (1<sup>st</sup> slider is for master volume)
 
 Hide to systray hides the window, the window can be revealed again from the systray icon option  ``Show`` 
 
 There is also a checkbox than when checked changes the ``hideDefault`` value if you want the window to be hidden at startup
 
-The options available refreshes and changes (if new programs are opened or others closed) when the mouse hovers any of the option menus
+The options available refreshes and changes (if new programs are opened or others closed) when the mouse hovers any of the scrollable frames
 
 To close the application you can just close this window or close it with the ``Exit`` option in the systray icon
 
@@ -65,7 +65,7 @@ To close the application you can just close this window or close it with the ``E
 To run the program you require [processes.yaml](processes.yaml) file with the structure : 
 ```yaml
 hideDefault: false
-slider1: []
+slider1: []	
 slider2: []
 slider3: []
 
