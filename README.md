@@ -65,9 +65,9 @@ To close the application you can just close this window or close it with the ``E
 To run the program you require [processes.yaml](processes.yaml) file with the structure : 
 ```yaml
 hideDefault: false
-slider1: ''
-slider2: ''
-slider3: ''
+slider1: []
+slider2: []
+slider3: []
 
 ```
 The values are the processes each slide changes and can be changed manually or through the UI

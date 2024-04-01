@@ -14,6 +14,7 @@ import threading
 import customtkinter
 import yaml
 import os
+from functools import partial
 
 
 # Setup global variables
@@ -78,18 +79,30 @@ def guiManipulator():
 
     # Assigns the process for the 2º slider (1º slider is for master volume) and writes to the YAML file
     def assign1(session):
-        configfile['slider1'] = session
+        if session not in configfile['slider1']:
+            configfile['slider1'].append(session)
+        else:
+            configfile['slider1'].remove(session)
         write_yaml(configfile)
+        root.after(0, update1)
     
     # Assigns the process for the 3º slider (1º slider is for master volume) and writes to the YAML file
     def assign2(session):
-        configfile['slider2'] = session
+        if session not in configfile['slider2']:
+            configfile['slider2'].append(session)
+        else:
+            configfile['slider2'].remove(session)
         write_yaml(configfile)
+        root.after(0, update2)
     
     # Assigns the process for the 4º slider (1º slider is for master volume) and writes to the YAML file
     def assign3(session):
-        configfile['slider3'] = session
+        if session not in configfile['slider3']:
+            configfile['slider3'].append(session)
+        else:
+            configfile['slider3'].remove(session)
         write_yaml(configfile)
+        root.after(0, update3)
         
     # Closes UI and the audio thread
     def close():
@@ -109,36 +122,74 @@ def guiManipulator():
         else:
             configfile['hideDefault'] = True
             write_yaml(configfile)
-            
-    # Creates empty sessionList
-    sessionList = []
 
-    # Appends all current processes to sessionList and changes the values of the option menus
-    def listUpdate(event=None):
-        
-        # Empties the list
-        sessionList = []
-
-        # Gets current processes
+    # Updates checkboxes in the frame
+    def update1(event=None):
+        for widget in frame1.winfo_children():
+            widget.destroy()
+        i = 0
         sessions = AudioUtilities.GetAllSessions()
-        
-        # Appends all current processes to sessionList 
+        for element in configfile['slider1']:
+            isSelect = customtkinter.BooleanVar()
+            isSelect.set(True)
+            frame1.checkbox = customtkinter.CTkCheckBox(frame1, text=element, command=partial(assign1, element), variable=isSelect)
+            frame1.checkbox.grid(row=i, column=0, padx=20, pady=5)
+            i += 1
         for session in sessions:
             if session.Process is not None:
-                
-                # Appends the process name
-                sessionList.append(session.Process.name())
-        
-        # Changes the dropdown value to the new list of processes 
-        dropdown_menu1.configure(values=sessionList)
-        dropdown_menu2.configure(values=sessionList)
-        dropdown_menu3.configure(values=sessionList)
+                if session.Process.name() not in configfile['slider1']:
+                    frame1.checkbox = customtkinter.CTkCheckBox(frame1, text=session.Process.name(), command=partial(assign1, session.Process.name()))
+                    frame1.checkbox.grid(row=i, column=0, padx=20, pady=5)
+                i += 1
+    
+    # Updates checkboxes in the frame
+    def update2(event=None):
+        for widget in frame2.winfo_children():
+            widget.destroy()
+        i = 0
+        sessions = AudioUtilities.GetAllSessions()
+        for element in configfile['slider2']:
+            isSelect = customtkinter.BooleanVar()
+            isSelect.set(True)
+            frame1.checkbox = customtkinter.CTkCheckBox(frame2, text=element, command=partial(assign2, element), variable=isSelect)
+            frame1.checkbox.grid(row=i, column=0, padx=20, pady=5)
+            i += 1
+        for session in sessions:
+            if session.Process is not None:
+                if session.Process.name() not in configfile['slider2']:
+                    frame1.checkbox = customtkinter.CTkCheckBox(frame2, text=session.Process.name(), command=partial(assign2, session.Process.name()))
+                    frame1.checkbox.grid(row=i, column=0, padx=20, pady=5)
+                i += 1
+    
+    # Updates checkboxes in the frame
+    def update3(event=None):
+        for widget in frame3.winfo_children():
+            widget.destroy()
+        i = 0
+        sessions = AudioUtilities.GetAllSessions()
+        for element in configfile['slider3']:
+            isSelect = customtkinter.BooleanVar()
+            isSelect.set(True)
+            frame1.checkbox = customtkinter.CTkCheckBox(frame3, text=element, command=partial(assign3, element), variable=isSelect)
+            frame1.checkbox.grid(row=i, column=0, padx=20, pady=5)
+            i += 1
+        for session in sessions:
+            if session.Process is not None:
+                if session.Process.name() not in configfile['slider3']:
+                    frame1.checkbox = customtkinter.CTkCheckBox(frame3, text=session.Process.name(), command=partial(assign3, session.Process.name()))
+                    frame1.checkbox.grid(row=i, column=0, padx=20, pady=5)
+                i += 1
 
+    # Checks if program must check the chckbox by default
+    def checkHide(event=None):
+        
         # Checks if window is hidden by default
         if configfile['hideDefault'] == True:
             defHide.set(True)
         else:
             defHide.set(False)
+    
+    
     
     # Sets display mode to system setting (dark || light)
     customtkinter.set_appearance_mode("system")
@@ -149,8 +200,10 @@ def guiManipulator():
     # Initiates customtkinter
     root = customtkinter.CTk()
 
-    # (Set the windows size to 300x400 (works fine with 1080p))
-    root.geometry("300x450") 
+    
+
+    # (Set the windows size to 300x1000 (works fine with 1080p))
+    root.geometry("300x1000") 
 
     # Sets window title
     root.title("Mixuino")
@@ -169,44 +222,35 @@ def guiManipulator():
     label = customtkinter.CTkLabel(master=frame, text="Slider 2", font=("roboto", 24))
     label.pack(pady=12, padx=12)
 
-    # Creates an optionmenu with the options being the values of sessionlist
-    dropdown_menu1 = customtkinter.CTkOptionMenu(frame, values=sessionList, command=assign1)
-    dropdown_menu1.pack(padx=10, pady=10)
+    # Creates scrollable frame 
+    frame1 = customtkinter.CTkScrollableFrame(frame)
+    frame1.pack(padx=5, pady=5)
+
+    # When the mouse hovers above the scrollable frame refresh the programs
+    frame1.bind('<Enter>', update1)
     
-    # Sets the displaying option as the option in the YAML file with key 'slider1'
-    dropdown_menu1.set(configfile['slider1'])
-
-    # When the mouse hovers above the option menu refresh the sessionlist
-    dropdown_menu1.bind('<Enter>', listUpdate)
-
     # Creates label (text) and sets padding
     label = customtkinter.CTkLabel(master=frame, text="Slider 3", font=("roboto", 24))
     label.pack(pady=12, padx=12)
 
-    # Creates an optionmenu with the options being the values of sessionlist
-    dropdown_menu2 = customtkinter.CTkOptionMenu(frame, values=sessionList, command=assign2)
-    dropdown_menu2.pack(padx=10, pady=10)
-    
-    # Sets the displaying option as the option in the YAML file with key 'slider2'
-    dropdown_menu2.set(configfile['slider2'])
+    # Creates scrollable frame 
+    frame2 = customtkinter.CTkScrollableFrame(frame)
+    frame2.pack(padx=5, pady=5)
 
-    # When the mouse hovers above the option menu refresh the sessionlist
-    dropdown_menu2.bind('<Enter>', listUpdate)
+    # When the mouse hovers above the scrollable frame refresh the programs
+    frame2.bind('<Enter>', update2)
 
     # Creates label (text) and sets padding
     label = customtkinter.CTkLabel(master=frame, text="Slider 4", font=("roboto", 24))
     label.pack(pady=12, padx=12)
 
-    # Creates an optionmenu with the options being the values of sessionlist
-    dropdown_menu3 = customtkinter.CTkOptionMenu(frame, values=sessionList, command=assign3)
-    dropdown_menu3.pack(padx=10, pady=10)
-    
-    # Sets the displaying option as the option in the YAML file with key 'slider3'
-    dropdown_menu3.set(configfile['slider3'])
+    # Creates scrollable frame 
+    frame3 = customtkinter.CTkScrollableFrame(frame)
+    frame3.pack(padx=5, pady=5)
 
-    # When the mouse hovers above the option menu refresh the sessionlist
-    dropdown_menu3.bind('<Enter>', listUpdate)
-    
+    # When the mouse hovers above the scrollable frane refresh the programs
+    frame3.bind('<Enter>', update3)
+
     # Creates button that hides the window when clicked
     button = customtkinter.CTkButton(frame, text="Hide to systray", command=hide)
     button.pack(padx=10, pady=10)
@@ -218,9 +262,15 @@ def guiManipulator():
     # When window is close shut the program
     root.protocol("WM_DELETE_WINDOW", close)
 
-    # Update the list for the first time while starting the program
-    root.after(50, listUpdate)
-
+    # Update defHide while starting the program
+    root.after(0, checkHide)
+    
+    # Updates the programs shown in the frames
+    root.after(0, update1)
+    root.after(0, update2)
+    root.after(0, update3)
+    
+    
     # Initiates the UI and the mainloop
     root.mainloop()    
 
@@ -358,12 +408,11 @@ def audioManipulator():
                         if serialData:
                             
                             # Adds the slider values to the slider list
-                            slider =[]
+                            slider = []
                             slider.append(serialData[0:4])   # Slider[0]
                             slider.append(serialData[4:8])   # Slider[1]
                             slider.append(serialData[8:12])  # Slider[2]
                             slider.append(serialData[12:16]) # Slider[3]
-
                             # Assigns the data in float format into a variable
                             masterVolume = float(slider[0])
 
@@ -380,7 +429,7 @@ def audioManipulator():
                                         processedVolume = session._ctl.QueryInterface(ISimpleAudioVolume)
                                         
                                         # Checks if the process is the one you want
-                                        if session.Process and session.Process.name() == configfile[f'slider{i}']:
+                                        if session.Process and session.Process.name() in configfile[f'slider{i}']:
                                             
                                             # Assigns the data in float format into a variable
                                             masterVolume = float(slider[i])   
