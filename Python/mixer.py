@@ -202,8 +202,8 @@ def guiManipulator():
 
     
 
-    # (Set the windows size to 300x1000 (works fine with 1080p))
-    root.geometry("300x1000") 
+    # (Set the windows size to 737x500, odd resolution, I know, it just fits perfectly (works fine with 1080p))
+    root.geometry("737x400") 
 
     # Sets window title
     root.title("Mixuino")
@@ -220,44 +220,44 @@ def guiManipulator():
 
     # Creates label (text) and sets padding
     label = customtkinter.CTkLabel(master=frame, text="Slider 2", font=("roboto", 24))
-    label.pack(pady=12, padx=12)
+    label.grid(row=0, column=0, pady=12, padx=12)
 
     # Creates scrollable frame 
     frame1 = customtkinter.CTkScrollableFrame(frame)
-    frame1.pack(padx=5, pady=5)
+    frame1.grid(row=1, column=0, padx=5, pady=5)
 
     # When the mouse hovers above the scrollable frame refresh the programs
     frame1.bind('<Enter>', update1)
     
     # Creates label (text) and sets padding
     label = customtkinter.CTkLabel(master=frame, text="Slider 3", font=("roboto", 24))
-    label.pack(pady=12, padx=12)
+    label.grid(row=0, column=1, pady=12, padx=12)
 
     # Creates scrollable frame 
     frame2 = customtkinter.CTkScrollableFrame(frame)
-    frame2.pack(padx=5, pady=5)
+    frame2.grid(row=1, column=1, padx=5, pady=5)
 
     # When the mouse hovers above the scrollable frame refresh the programs
     frame2.bind('<Enter>', update2)
 
     # Creates label (text) and sets padding
     label = customtkinter.CTkLabel(master=frame, text="Slider 4", font=("roboto", 24))
-    label.pack(pady=12, padx=12)
-
+    label.grid(row=0, column=2, pady=12, padx=12)
+    
     # Creates scrollable frame 
     frame3 = customtkinter.CTkScrollableFrame(frame)
-    frame3.pack(padx=5, pady=5)
+    frame3.grid(row=1, column=2, padx=5, pady=5)
 
     # When the mouse hovers above the scrollable frane refresh the programs
     frame3.bind('<Enter>', update3)
 
     # Creates button that hides the window when clicked
     button = customtkinter.CTkButton(frame, text="Hide to systray", command=hide)
-    button.pack(padx=10, pady=10)
+    button.grid(row=6, column=1, padx=5, pady=5)
     
     # Creates checkbox that sets if the window should be hidden on startup
     hideDefault = customtkinter.CTkCheckBox(frame, text="Hide to systray on startup", command=defaultHide, variable=defHide)
-    hideDefault.pack(padx=10, pady=10)
+    hideDefault.grid(row=7, column=1, padx=5, pady=5)
     
     # When window is close shut the program
     root.protocol("WM_DELETE_WINDOW", close)
