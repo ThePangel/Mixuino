@@ -133,8 +133,9 @@ pip install customtkinter
 ## Roadmap!
 
 
-- [ ] Slider 3D Models for 3D printing!
+- [x] Slider 3D Models for 3D printing! (7/7/2024)
 - [x] GUI to select which slides control which process (30/12/2023)
+- [x] Mixuino PCB (7/7/2024)
 
 ---
 ## Contributing?
