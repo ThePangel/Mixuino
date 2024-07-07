@@ -34,6 +34,8 @@
 
 Mixuino is a windows audio mixer build with on a Arduino nano and controlled by a python program. It uses 4 slide potentiometers feeding analog input into an Arduino nano that sends the values through serial to a python scripts that handles volume management in the windows machine. You can also add an optional push button to mute/un-mute the speakers. 
 
+I also have made a PCB for ease of instalation + a 3D printable enclosure for the latter so you can build your own Mixer.
+
 This is my first Arduino projects and first *"big"* program so please bear with me :)
 
 -----
